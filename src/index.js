@@ -20,21 +20,59 @@ function checksExistsUserAccount(request, response, next) {
     });
   }
 
-  request.userMiddlewares = userExists;
+  request.user = userExists;
 
   return next();
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
-  // Complete aqui
+  const { user } = request;
+
+  if(!user.pro){
+    if(user.todos.length >= 10){
+      return response.status(403).json({
+        error: "nao tem permissão"
+      });
+    }
+  }
+
+ return next();
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers;
+  const { id } = request.params;
+
+  const user = users.find((user) => user.username === username);
+
+  if(!user){
+    return response.status(404).json({
+      error: "User not exists!"
+    });
+  }
+
+  if(!validate(id)){
+    return response.status(400).json({
+      error: "The provided ID is not a uuid!"
+    });
+  }
+
+  const idTodo = user.todos.find((todo) => todo.id === id);
+
+  if(!idTodo){
+    return response.status(404).json({
+      error: "TODO not found!"
+    });
+  }
+
+  request.todo = idTodo;
+  request.user = user;
+
+  return next();
 }
 
 function findUserById(request, response, next) {
-  // Complete aqui
+  
 }
 
 app.post('/users', (request, response) => {
@@ -50,7 +88,7 @@ app.post('/users', (request, response) => {
     id: uuidv4(),
     name,
     username,
-    pro: false,
+    pro: true,
     todos: []
   };
 

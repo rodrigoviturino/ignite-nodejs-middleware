@@ -15,7 +15,7 @@ function checksExistsUserAccount(request, response, next) {
   const userExists = users.find((user) => user.username === username);
 
   if(!userExists){
-    return response.status(400).json({
+    return response.status(404).json({
       error: "User Exists!"
     });
   }
@@ -74,15 +74,15 @@ function checksTodoExists(request, response, next) {
 function findUserById(request, response, next) {
   const { id } = request.params;
 
-  const user = users.find((user) => user.id === id);
+  const idUser = users.find((user) => user.id === id);
 
-  if(!user){
-    return response.status(400).json({
+  if(!idUser){
+    return response.status(404).json({
       error: "User not found!"
     });
   }
-  request.user = user;
-  
+  request.user = idUser;
+
   return next();
 }
 
@@ -99,7 +99,7 @@ app.post('/users', (request, response) => {
     id: uuidv4(),
     name,
     username,
-    pro: true,
+    pro: false,
     todos: []
   };
 
